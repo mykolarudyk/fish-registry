@@ -1,0 +1,9 @@
+* text=auto
+
+# Shell scripts & Maven wrapper (Unix line endings)
+*.sh text eol=lf
+mvnw text eol=lf
+
+# Windows scripts
+*.cmd text eol=crlf
+*.bat text eol=crlf

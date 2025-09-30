@@ -1,0 +1,36 @@
+# --- OS / Editors ---
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/extensions.json
+
+# Java
+backend/target/
+*.log
+
+# Local H2 files
+backend/.localdb/
+*.h2.db
+*.mv.db
+*.trace.db
+
+# Angular
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/cache/
+frontend/tmp/
+frontend/out-tsc/
+frontend/coverage/
+
+# IDE trash
+*.iml
+.idea/
+.project
+.classpath
+.settings/
+.history/
