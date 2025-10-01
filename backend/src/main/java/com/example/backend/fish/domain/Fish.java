@@ -23,30 +23,29 @@ public class Fish {
 
   @Column(nullable = false)
   @Min(1)
-  private int lengthCm;
+  private int length;
 
   @Column(nullable = false, precision = 10, scale = 2)
   @DecimalMin(value = "0.01")
-  private BigDecimal weightKg;
+  private BigDecimal weight;
 
-  protected Fish() {} // JPA
+  protected Fish() {}
 
-  public Fish(String name, String species, int lengthCm, BigDecimal weightKg) {
+  public Fish(String name, String species, int length, BigDecimal weight) {
     this.name = name;
     this.species = species;
-    this.lengthCm = lengthCm;
-    this.weightKg = weightKg;
+    this.length = length;
+    this.weight = weight;
   }
 
-  // getters & setters
   public UUID getId() { return id; }
   public void setId(UUID id) { this.id = id; }
   public String getName() { return name; }
   public void setName(String name) { this.name = name; }
   public String getSpecies() { return species; }
   public void setSpecies(String species) { this.species = species; }
-  public int getLengthCm() { return lengthCm; }
-  public void setLengthCm(int lengthCm) { this.lengthCm = lengthCm; }
-  public BigDecimal getWeightKg() { return weightKg; }
-  public void setWeightKg(BigDecimal weightKg) { this.weightKg = weightKg; }
+  public int getLength() { return length; }
+  public void setLength(int length) { this.length = length; }
+  public BigDecimal getWeight() { return weight; }
+  public void setWeight(BigDecimal weight) { this.weight = weight; }
 }

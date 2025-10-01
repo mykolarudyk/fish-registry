@@ -26,13 +26,14 @@ public class FishService {
     return repo.findAll(pageable).map(this::toResponse);
   }
 
+  // Could be useful for details page
   public FishResponse get(UUID id) {
     return toResponse(repo.findById(id).orElseThrow(() ->
         new NoSuchElementException("Fish " + id + " not found")));
   }
 
   public Created create(FishRequest req) {
-    var entity = repo.save(new Fish(req.name(), req.species(), req.lengthCm(), req.weightKg()));
+    var entity = repo.save(new Fish(req.name(), req.species(), req.length(), req.weight()));
     return new Created(entity.getId(), URI.create("/api/fish/" + entity.getId()));
   }
 
@@ -41,8 +42,8 @@ public class FishService {
         new NoSuchElementException("Fish " + id + " not found"));
     entity.setName(req.name());
     entity.setSpecies(req.species());
-    entity.setLengthCm(req.lengthCm());
-    entity.setWeightKg(req.weightKg());
+    entity.setLength(req.length());
+    entity.setWeight(req.weight());
     return toResponse(entity);
   }
 
@@ -52,7 +53,7 @@ public class FishService {
   }
 
   private FishResponse toResponse(Fish f) {
-    return new FishResponse(f.getId(), f.getName(), f.getSpecies(), f.getLengthCm(), f.getWeightKg());
+    return new FishResponse(f.getId(), f.getName(), f.getSpecies(), f.getLength(), f.getWeight());
   }
 
   public record Created(UUID id, URI location) {}

@@ -10,12 +10,12 @@ public final class FishDtos {
   public record FishRequest(
       @NotBlank @Size(max = 100) String name,
       @NotBlank @Size(max = 100) String species,
-      @Min(1) int lengthCm,
-      @DecimalMin("0.01") BigDecimal weightKg
+      @Min(1) int length,
+      @DecimalMin("0.01") BigDecimal weight
   ) {}
 
     // Response
   public record FishResponse(
-      UUID id, String name, String species, int lengthCm, BigDecimal weightKg
+      UUID id, String name, String species, int length, BigDecimal weight
   ) {}
 }
