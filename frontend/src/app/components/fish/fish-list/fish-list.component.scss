@@ -1,7 +1,63 @@
+:host { display: block; }
+
+.page {
+  padding: 16px 24px;
+  display: grid;
+  gap: 16px;
+}
+
 .fish-form {
-  padding:16px;
-  margin-bottom:16px;
-  display:grid;
-  grid-template-columns: 1fr 1fr 120px 120px auto;
-  gap:12px
+  display: grid;
+  grid-template-columns: 1fr 1fr 160px 160px auto;
+  gap: 12px;
+  padding: 16px;
+}
+
+.table-wrap {
+  width: 100%;
+  overflow: auto;
+}
+
+.data-table,
+.mat-mdc-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.mat-column-name    { width: 34%; }
+.mat-column-species { width: 34%; }
+.mat-column-length  { width: 120px; }
+.mat-column-weight  { width: 140px; }
+.mat-column-actions { width: 96px; }
+
+::ng-deep .mat-mdc-table .mat-mdc-header-cell,
+::ng-deep .mat-mdc-table .mat-mdc-cell {
+  vertical-align: middle;
+}
+
+.inline-input {
+  width: 100%;
+  box-sizing: border-box;
+  height: 40px;
+  line-height: 40px;
+  padding: 0 10px;
+  border: 1px solid rgba(0,0,0,0.14);
+  border-radius: 8px;
+  font: inherit;
+  background: #fff;
+}
+
+.inline-number {
+  text-align: right;
+}
+
+.inline-input.ng-invalid.ng-dirty,
+.inline-input.ng-invalid.ng-touched {
+  border-color: #e53935;
+}
+
+.actions {
+  white-space: nowrap;
+  align-items: center;
+  gap: 6px;
 }

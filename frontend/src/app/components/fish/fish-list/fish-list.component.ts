@@ -101,8 +101,8 @@ export class FishListComponent implements AfterViewInit{
       form = this.fb.group({
         name: this.fb.control(row.name, { validators: [Validators.required, Validators.maxLength(100)] }),
         species: this.fb.control(row.species, { validators: [Validators.required, Validators.maxLength(100)] }),
-        length: this.fb.control(row.length, { validators: [Validators.required, Validators.min(0)] }),
-        weight: this.fb.control(row.weight, { validators: [Validators.required, Validators.min(0)] }),
+        length: this.fb.control(row.length, { validators: [Validators.required, Validators.min(1)] }),
+        weight: this.fb.control(row.weight, { validators: [Validators.required, Validators.min(0.01)] }),
       });
       this.forms.set(row.id, form);
     }
@@ -194,7 +194,11 @@ export class FishListComponent implements AfterViewInit{
     this.showNewForm.set(false);
   }
 
+  rowInvalid(row: Fish) {
+    return this.formFor(row).invalid;
+  }
+
   control<K extends keyof FishForm['controls']>(row: Fish, key: K): FishForm['controls'][K] {
-  return this.formFor(row).controls[key];
-}
+    return this.formFor(row).controls[key];
+  }
 }
