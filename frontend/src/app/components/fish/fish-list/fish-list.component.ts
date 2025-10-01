@@ -9,7 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { merge, startWith, switchMap, map, catchError, of } from 'rxjs';
+import { merge, startWith, switchMap, map, catchError, of, auditTime, finalize, debounceTime } from 'rxjs';
 import { FishService } from '../../../services/fish.service';
 import { Fish } from '../../../models/fish.model';
 import { FormGroupDirective } from '@angular/forms';
@@ -20,6 +20,8 @@ type FishForm = FormGroup<{
   length: FormControl<number>;
   weight: FormControl<number>;
 }>;
+
+const NEW_ID = '__new__';
 
 @Component({
   selector: 'app-fish-list',
@@ -52,6 +54,7 @@ export class FishListComponent implements AfterViewInit{
 
   private forms = new Map<string, FishForm>();
   showNewForm = signal(false);
+  creatingInline = signal(false);
   editingId = signal<string | null>(null);
   isEditing = (id: string) => this.editingId() === id;
 
@@ -78,7 +81,9 @@ export class FishListComponent implements AfterViewInit{
           const sortExpr = `${this.sort.active || 'name'},${this.sort.direction || 'asc'}`;
           const page = this.paginator.pageIndex ?? 0;
           const size = this.paginator.pageSize || this.pageSize;
-          return this.fishService.list(page, size, sortExpr);
+          return this.fishService.list(page, size, sortExpr).pipe(
+            finalize(() => this.loading.set(false))
+          );
         }),
         map(page => {
           this.total.set(page.totalElements ?? 0);
@@ -128,6 +133,11 @@ export class FishListComponent implements AfterViewInit{
       weight: row.weight,
     });
     if (this.editingId() === row.id) this.editingId.set(null);
+    if (row.id === NEW_ID) {
+      this.rows.update(rs => rs.filter(r => r.id !== NEW_ID));
+      this.forms.delete(NEW_ID);
+      this.creatingInline.set(false);
+    }
   }
 
   save(row: Fish) {
@@ -135,6 +145,18 @@ export class FishListComponent implements AfterViewInit{
     if (form.invalid) { form.markAllAsTouched(); return; }
     const { name, species, length, weight } = form.getRawValue();
     this.loading.set(true);
+    if (row.id === NEW_ID) {
+      this.fishService.create({ name, species, length, weight }).subscribe({
+        next: () => {
+          this.editingId.set(null);
+          this.creatingInline.set(false);
+          this.forms.delete(NEW_ID);
+          this._refreshCurrentPage(true);
+        },
+        error: () => this.loading.set(false),
+      });
+      return;
+    }
     this.fishService.update(row.id, { name, species, length, weight }).subscribe({
       next: () => {
         this.editingId.set(null);
@@ -169,6 +191,20 @@ export class FishListComponent implements AfterViewInit{
       },
       error: () => this.loading.set(false),
     });
+  }
+
+  openCreateInline() {
+    if (this.editingId() || this.creatingInline()) return;
+    const newRow: Fish = { id: NEW_ID, name: '', species: '', length: 1, weight: 0.01 };
+    this.rows.update(rs => [newRow, ...rs]);
+    this.forms.set(NEW_ID, this.fb.group({
+      name: this.fb.control('', { validators: [Validators.required, Validators.maxLength(100)] }),
+      species: this.fb.control('', { validators: [Validators.required, Validators.maxLength(100)] }),
+      length: this.fb.control(1, { validators: [Validators.required, Validators.min(1)] }),
+      weight: this.fb.control(0.01, { validators: [Validators.required, Validators.min(0.01)] }),
+    }));
+    this.editingId.set(NEW_ID);
+    this.creatingInline.set(true);
   }
 
   private _refreshCurrentPage(goToFirst = false) {

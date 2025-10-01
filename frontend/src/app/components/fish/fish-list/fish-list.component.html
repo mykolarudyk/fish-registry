@@ -9,9 +9,19 @@
       mat-raised-button
       color="primary"
       (click)="openCreateForm()"
-      [disabled]="showNewForm() || !!editingId()"
+      [disabled]="showNewForm() || !!editingId() || creatingInline()"
     >
       Add fish
+    </button>
+
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="openCreateInline()"
+      [disabled]="creatingInline() || !!editingId() || showNewForm()"
+      style="margin-left: 8px"
+    >
+      Add inline
     </button>
   </div>
 
@@ -145,7 +155,7 @@
               color="primary"
               (click)="startEdit(f)"
               aria-label="Edit"
-              [disabled]="(editingId() && !isEditing(f.id)) || showNewForm()"
+              [disabled]="(editingId() && !isEditing(f.id)) || showNewForm() || creatingInline()"
             >
               <mat-icon>edit</mat-icon>
             </button>
