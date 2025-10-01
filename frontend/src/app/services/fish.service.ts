@@ -1,9 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment';
-import { Page } from '../../shared/page.model';
-import { Fish } from './fish.model';
+import { environment } from '../../environments/environment';
+import { Page } from '../models/page.model';
+import { Fish } from '../models/fish.model';
 
 @Injectable({ providedIn: 'root' })
 export class FishService {

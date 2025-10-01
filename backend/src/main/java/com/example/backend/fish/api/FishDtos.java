@@ -6,7 +6,6 @@ import java.util.UUID;
 
 public final class FishDtos {
 
-  // Create & Update
   public record FishRequest(
       @NotBlank @Size(max = 100) String name,
       @NotBlank @Size(max = 100) String species,
@@ -14,7 +13,6 @@ public final class FishDtos {
       @DecimalMin("0.01") BigDecimal weight
   ) {}
 
-    // Response
   public record FishResponse(
       UUID id, String name, String species, int length, BigDecimal weight
   ) {}

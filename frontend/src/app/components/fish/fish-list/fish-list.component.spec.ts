@@ -2,8 +2,7 @@ import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testin
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
 import { FishListComponent } from './fish-list.component';
-import { FishService } from '../fish.service';
-import { PageEvent } from '@angular/material/paginator';
+import { FishService } from '../../../services/fish.service';
 
 class MockFishService {
   list = jasmine.createSpy('list').and.returnValue(of({

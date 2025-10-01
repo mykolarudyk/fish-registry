@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "api": "cd backend && mvnw.cmd -q spring-boot:run",
-    "web": "cd frontend && ng serve --proxy-config proxy.conf.json",
+    "web": "cd frontend && ng serve",
     "dev": "concurrently -n api,web -c auto \"npm:api\" \"npm:web\""
   },
   "devDependencies": {

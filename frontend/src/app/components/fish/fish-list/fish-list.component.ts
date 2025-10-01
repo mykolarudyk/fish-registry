@@ -10,8 +10,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { merge, startWith, switchMap, map, catchError, of } from 'rxjs';
-import { FishService } from '../fish.service';
-import { Fish } from '../fish.model';
+import { FishService } from '../../../services/fish.service';
+import { Fish } from '../../../models/fish.model';
 import { FormGroupDirective } from '@angular/forms';
 
 type FishForm = FormGroup<{
@@ -39,6 +39,7 @@ type FishForm = FormGroup<{
   templateUrl: './fish-list.component.html',
   styleUrls: ['./fish-list.component.scss'],
 })
+
 export class FishListComponent implements AfterViewInit{
   private fishService = inject(FishService);
   private fb = inject(NonNullableFormBuilder);
