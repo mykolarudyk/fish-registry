@@ -5,12 +5,13 @@ import static com.example.backend.fish.api.FishDtos.*;
 import com.example.backend.fish.domain.Fish;
 import com.example.backend.fish.infra.FishRepository;
 import java.net.URI;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @Transactional
@@ -26,10 +27,10 @@ public class FishService {
     return repo.findAll(pageable).map(this::toResponse);
   }
 
-  // Could be useful for details page
   public FishResponse get(UUID id) {
-    return toResponse(repo.findById(id).orElseThrow(() ->
-        new NoSuchElementException("Fish " + id + " not found")));
+    var entity = repo.findById(id)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Fish " + id + " not found"));
+    return toResponse(entity);
   }
 
   public Created create(FishRequest req) {
@@ -38,8 +39,8 @@ public class FishService {
   }
 
   public FishResponse update(UUID id, FishRequest req) {
-    var entity = repo.findById(id).orElseThrow(() ->
-        new NoSuchElementException("Fish " + id + " not found"));
+    var entity = repo.findById(id)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Fish " + id + " not found"));
     entity.setName(req.name());
     entity.setSpecies(req.species());
     entity.setLength(req.length());
@@ -48,7 +49,9 @@ public class FishService {
   }
 
   public void delete(UUID id) {
-    if (!repo.existsById(id)) throw new NoSuchElementException("Fish " + id + " not found");
+    if (!repo.existsById(id)) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Fish " + id + " not found");
+    }
     repo.deleteById(id);
   }
 
