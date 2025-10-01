@@ -24,6 +24,12 @@
   width: 100%;
 }
 
+.table-wrap,
+.data-table,
+.mat-mdc-table {
+  caret-color: transparent;
+}
+
 .mat-column-name    { width: 34%; }
 .mat-column-species { width: 34%; }
 .mat-column-length  { width: 120px; }
