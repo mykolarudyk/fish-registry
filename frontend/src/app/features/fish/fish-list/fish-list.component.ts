@@ -1,14 +1,14 @@
-import { AfterViewInit, Component, ViewChild, inject, signal} from '@angular/core';
+import { AfterViewInit, Component, ViewChild, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
-import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
+import { MatSort, MatSortModule} from '@angular/material/sort';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { merge, startWith, switchMap, map, catchError, of } from 'rxjs';
 import { FishService } from '../fish.service';
 import { Fish } from '../fish.model';
@@ -39,7 +39,7 @@ type FishForm = FormGroup<{
   templateUrl: './fish-list.component.html',
   styleUrls: ['./fish-list.component.scss'],
 })
-export class FishListComponent implements AfterViewInit {
+export class FishListComponent implements AfterViewInit{
   private fishService = inject(FishService);
   private fb = inject(NonNullableFormBuilder);
 
@@ -50,8 +50,8 @@ export class FishListComponent implements AfterViewInit {
   pageSize = 10;
 
   private forms = new Map<string, FishForm>();
-  protected showNewForm = signal(false);
-  protected editingId = signal<string | null>(null);
+  showNewForm = signal(false);
+  editingId = signal<string | null>(null);
   isEditing = (id: string) => this.editingId() === id;
 
   newForm: FishForm = this.fb.group({
@@ -61,39 +61,37 @@ export class FishListComponent implements AfterViewInit {
     weight: this.fb.control(0, { validators: [Validators.required, Validators.min(0.01)] }),
   });
 
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
+  @ViewChild(MatSort, { static: true }) sort!: MatSort;
   @ViewChild('createForm', { read: FormGroupDirective })
   createFormDir!: FormGroupDirective;
 
   ngAfterViewInit(): void {
-    merge(
-      this.sort.sortChange.pipe(startWith({ active: 'name', direction: 'asc' } as Sort)),
-      this.paginator.page.pipe(startWith({ pageIndex: 0, pageSize: this.pageSize }))
-    ).pipe(
-      switchMap(() => this.fetchPage()),
-      catchError(() => {
-        this.total.set(0);
-        return of([]);
-      })
-    ).subscribe((data) => {
-      this.rows.set(data);
-      this.loading.set(false);
-      this.forms.clear();
-      this.editingId.set(null);
-    });
-  }
+    this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
 
-  private fetchPage() {
-    this.loading.set(true);
-    const sortExpr = `${this.sort?.active || 'name'},${this.sort?.direction || 'asc'}`;
-    return this.fishService.list(this.paginator?.pageIndex ?? 0, this.paginator?.pageSize ?? this.pageSize, sortExpr)
+    merge(this.sort.sortChange, this.paginator.page)
       .pipe(
-        map((page) => {
-          this.total.set(page.totalElements);
-          return page.content;
+        startWith({}),
+        switchMap(() => {
+          this.loading.set(true);
+          const sortExpr = `${this.sort.active || 'name'},${this.sort.direction || 'asc'}`;
+          const page = this.paginator.pageIndex ?? 0;
+          const size = this.paginator.pageSize || this.pageSize;
+          return this.fishService.list(page, size, sortExpr);
+        }),
+        map(page => {
+          this.total.set(page.totalElements ?? 0);
+          return page.content ?? [];
+        }),
+        catchError(() => {
+          this.total.set(0);
+          return of([]);
         })
-      );
+      )
+      .subscribe(data => {
+        this.rows.set(data);
+        this.loading.set(false);
+      });
   }
 
   private formFor(row: Fish): FishForm {
@@ -195,7 +193,7 @@ export class FishListComponent implements AfterViewInit {
     this.showNewForm.set(false);
   }
 
-  control(row: Fish, key: keyof FishForm['controls']) {
-    return this.formFor(row).controls[key];
-  }
+  control<K extends keyof FishForm['controls']>(row: Fish, key: K): FishForm['controls'][K] {
+  return this.formFor(row).controls[key];
+}
 }

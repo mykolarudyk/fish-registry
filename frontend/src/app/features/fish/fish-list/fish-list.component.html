@@ -23,17 +23,17 @@
     <mat-form-field appearance="outline">
       <mat-label>Name</mat-label>
       <input matInput formControlName="name" />
-      <mat-error *ngIf="newForm.controls.name.invalid && (newForm.controls.name.touched || createForm.submitted)">
-        Required
-      </mat-error>
+      @if (newForm.controls.name.invalid && (newForm.controls.name.touched || createForm.submitted)) {
+        <mat-error>Required</mat-error>
+      }
     </mat-form-field>
 
     <mat-form-field appearance="outline">
       <mat-label>Species</mat-label>
       <input matInput formControlName="species" />
-      <mat-error *ngIf="newForm.controls.species.invalid && (newForm.controls.species.touched || createForm.submitted)">
-        Required
-      </mat-error>
+        @if (newForm.controls.species.invalid && (newForm.controls.species.touched || createForm.submitted)) {
+          <mat-error>Required</mat-error>
+      }
     </mat-form-field>
 
      <mat-form-field appearance="outline">
@@ -45,12 +45,12 @@
         min="1"
         formControlName="length"
       />
-      <mat-error *ngIf="newForm.controls.length.hasError('required') && (newForm.controls.length.touched || createForm.submitted)">
-        Required
-      </mat-error>
-      <mat-error *ngIf="newForm.controls.length.hasError('min') && (newForm.controls.length.touched || createForm.submitted)">
-        Must be ≥ 1
-      </mat-error>
+      @if (newForm.controls.length.hasError('required') && (newForm.controls.length.touched || createForm.submitted)) {
+         <mat-error>Required</mat-error>
+      }
+      @if (newForm.controls.length.hasError('min') && (newForm.controls.length.touched || createForm.submitted)) {
+         <mat-error>Must be ≥ 1</mat-error>
+      }
     </mat-form-field>
 
     <mat-form-field appearance="outline">
@@ -63,12 +63,12 @@
         min="0.01"
         formControlName="weight"
       />
-      <mat-error *ngIf="newForm.controls.weight.hasError('required') && (newForm.controls.weight.touched || createForm.submitted)">
-        Required
-      </mat-error>
-      <mat-error *ngIf="newForm.controls.weight.hasError('min') && (newForm.controls.weight.touched || createForm.submitted)">
-        Must be ≥ 0.01
-      </mat-error>
+      @if (newForm.controls.weight.hasError('required') && (newForm.controls.weight.touched || createForm.submitted)) {
+         <mat-error>Required</mat-error>
+      }
+      @if (newForm.controls.weight.hasError('min') && (newForm.controls.weight.touched || createForm.submitted)) {
+         <mat-error>Must be ≥ 0.01</mat-error>
+      }
     </mat-form-field>
 
     <div style="display:flex; align-items:center; gap:8px">
