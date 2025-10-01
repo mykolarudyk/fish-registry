@@ -2,37 +2,81 @@
   <mat-progress-bar mode="indeterminate"></mat-progress-bar>
 }
 
-<form class="mat-elevation-z2"
-      style="padding:16px; margin-bottom:16px; display:grid; grid-template-columns: 1fr 1fr 120px 120px auto; gap:12px"
-      [formGroup]="newForm" (ngSubmit)="create()">
-  <mat-form-field appearance="outline">
-    <mat-label>Name</mat-label>
-    <input matInput formControlName="name" />
-    <mat-error *ngIf="newForm.controls.name.invalid">Required</mat-error>
-  </mat-form-field>
+<div style="margin: 8px 0 16px">
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="openCreateForm()"
+    [disabled]="showNewForm() || !!editingId()"
+  >
+    Add fish
+  </button>
+</div>
 
-  <mat-form-field appearance="outline">
-    <mat-label>Species</mat-label>
-    <input matInput formControlName="species" />
-    <mat-error *ngIf="newForm.controls.species.invalid">Required</mat-error>
-  </mat-form-field>
+@if (showNewForm()) {
+  <form
+    #createForm="ngForm"
+    class="mat-elevation-z2 fish-form"
+    [formGroup]="newForm"
+    (ngSubmit)="create()"
+  >
+    <mat-form-field appearance="outline">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" />
+      <mat-error *ngIf="newForm.controls.name.invalid && (newForm.controls.name.touched || createForm.submitted)">
+        Required
+      </mat-error>
+    </mat-form-field>
 
-  <mat-form-field appearance="outline">
-    <mat-label>Length (cm)</mat-label>
-    <input matInput type="number" formControlName="length" />
-    <mat-error *ngIf="newForm.controls.length.invalid">≥ 0</mat-error>
-  </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Species</mat-label>
+      <input matInput formControlName="species" />
+      <mat-error *ngIf="newForm.controls.species.invalid && (newForm.controls.species.touched || createForm.submitted)">
+        Required
+      </mat-error>
+    </mat-form-field>
 
-  <mat-form-field appearance="outline">
-    <mat-label>Weight (kg)</mat-label>
-    <input matInput type="number" step="0.01" formControlName="weight" />
-    <mat-error *ngIf="newForm.controls.weight.invalid">≥ 0</mat-error>
-  </mat-form-field>
+     <mat-form-field appearance="outline">
+      <mat-label>Length (cm)</mat-label>
+      <input
+        matInput
+        type="number"
+        inputmode="numeric"
+        min="1"
+        formControlName="length"
+      />
+      <mat-error *ngIf="newForm.controls.length.hasError('required') && (newForm.controls.length.touched || createForm.submitted)">
+        Required
+      </mat-error>
+      <mat-error *ngIf="newForm.controls.length.hasError('min') && (newForm.controls.length.touched || createForm.submitted)">
+        Must be ≥ 1
+      </mat-error>
+    </mat-form-field>
 
-  <div style="display:flex; align-items:center;">
-    <button mat-raised-button color="primary" type="submit">Add</button>
-  </div>
-</form>
+    <mat-form-field appearance="outline">
+      <mat-label>Weight (kg)</mat-label>
+      <input
+        matInput
+        type="number"
+        inputmode="decimal"
+        step="0.01"
+        min="0.01"
+        formControlName="weight"
+      />
+      <mat-error *ngIf="newForm.controls.weight.hasError('required') && (newForm.controls.weight.touched || createForm.submitted)">
+        Required
+      </mat-error>
+      <mat-error *ngIf="newForm.controls.weight.hasError('min') && (newForm.controls.weight.touched || createForm.submitted)">
+        Must be ≥ 0.01
+      </mat-error>
+    </mat-form-field>
+
+    <div style="display:flex; align-items:center; gap:8px">
+      <button mat-raised-button color="primary" type="submit">Add</button>
+      <button mat-stroked-button type="button" (click)="discardCreate()">Discard</button>
+    </div>
+  </form>
+}
 
 <table
   mat-table
@@ -99,7 +143,7 @@
     <th mat-header-cell *matHeaderCellDef>Actions</th>
     <td mat-cell *matCellDef="let f" style="white-space:nowrap">
       @if (!isEditing(f.id)) {
-        <button mat-icon-button color="primary" (click)="startEdit(f)" aria-label="Edit" [disabled]="editingId() && !isEditing(f.id)">
+        <button mat-icon-button color="primary" (click)="startEdit(f)" aria-label="Edit" [disabled]="(editingId() && !isEditing(f.id)) || showNewForm()">
           <mat-icon>edit</mat-icon>
         </button>
         <button mat-icon-button color="warn" (click)="remove(f)" aria-label="Delete">

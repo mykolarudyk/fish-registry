@@ -12,6 +12,7 @@ import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Va
 import { merge, startWith, switchMap, map, catchError, of } from 'rxjs';
 import { FishService } from '../fish.service';
 import { Fish } from '../fish.model';
+import { FormGroupDirective } from '@angular/forms';
 
 type FishForm = FormGroup<{
   name: FormControl<string>;
@@ -49,18 +50,21 @@ export class FishListComponent implements AfterViewInit {
   pageSize = 10;
 
   private forms = new Map<string, FishForm>();
+  protected showNewForm = signal(false);
   protected editingId = signal<string | null>(null);
   isEditing = (id: string) => this.editingId() === id;
 
   newForm: FishForm = this.fb.group({
     name: this.fb.control('', { validators: [Validators.required, Validators.maxLength(100)] }),
     species: this.fb.control('', { validators: [Validators.required, Validators.maxLength(100)] }),
-    length: this.fb.control(0, { validators: [Validators.required, Validators.min(0)] }),
-    weight: this.fb.control(0, { validators: [Validators.required, Validators.min(0)] }),
+    length: this.fb.control(0, { validators: [Validators.required, Validators.min(1)] }),
+    weight: this.fb.control(0, { validators: [Validators.required, Validators.min(0.01)] }),
   });
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild('createForm', { read: FormGroupDirective })
+  createFormDir!: FormGroupDirective;
 
   ngAfterViewInit(): void {
     merge(
@@ -159,9 +163,10 @@ export class FishListComponent implements AfterViewInit {
     this.loading.set(true);
     this.fishService.create(body).subscribe({
       next: () => {
-        this.newForm.reset({ name: '', species: '', length: 0, weight: 0 });
+        this.createFormDir.resetForm({ name: '', species: '', length: 0, weight: 0 });
+        this.showNewForm.set(false);
         this._refreshCurrentPage(true);
-        this.loading.set(false)
+        this.loading.set(false);
       },
       error: () => this.loading.set(false),
     });
@@ -173,6 +178,21 @@ export class FishListComponent implements AfterViewInit {
     } else {
       this.paginator._changePageSize(this.paginator.pageSize);
     }
+  }
+
+  openCreateForm() {
+    if (this.editingId()) return;
+    this.showNewForm.set(true);
+  }
+
+  discardCreate() {
+    if (this.createFormDir) {
+      this.createFormDir.resetForm({ name: '', species: '', length: 0, weight: 0 });
+    } else {
+      this.newForm.reset({ name: '', species: '', length: 0, weight: 0 });
+      Object.values(this.newForm.controls).forEach(c => { c.markAsPristine(); c.markAsUntouched(); });
+    }
+    this.showNewForm.set(false);
   }
 
   control(row: Fish, key: keyof FishForm['controls']) {

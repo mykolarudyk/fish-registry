@@ -18,6 +18,7 @@ export class FishService {
     return this.http.get<Page<Fish>>(this.base, { params });
   }
 
+  //Useful for detailed page of 1 fish
   get(id: string) {
     return this.http.get<Fish>(`${this.base}/${id}`);
   }
