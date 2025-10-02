@@ -65,8 +65,8 @@ export class FishListComponent implements AfterViewInit{
     weight: this.fb.control(0, { validators: [Validators.required, Validators.min(0.01)] }),
   });
 
-  @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
-  @ViewChild(MatSort, { static: true }) sort!: MatSort;
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
   @ViewChild('createForm', { read: FormGroupDirective })
   createFormDir!: FormGroupDirective;
 
